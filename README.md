@@ -6,8 +6,8 @@ A fully functional frontend project management application built using **React +
 
 ## Live Demo
 
-  https://your-project.vercel.app
-  GitHub Repo: https://github.com/your-username/project-tracker
+  [Live Demo](https://projectttracker.netlify.app/)
+  GitHub Repo: https://github.com/vikassoan/Project-Tracker
 
 ---
 
@@ -162,7 +162,7 @@ Virtual scrolling was implemented manually:
 ## Setup Instructions
 
 ```bash
-git clone https://github.com/your-username/project-tracker.git
+git clone https://github.com/your-username/Project-Tracker.git
 cd project-tracker
 npm install
 npm run dev
@@ -205,10 +205,212 @@ With more time, I would extract drag logic into a more reusable abstraction and 
 
 ---
 
+##  Performance Optimization Journey (56 → 90+ Lighthouse)
+
+Initially, the application scored around **56 in Lighthouse Performance**, primarily due to heavy initial rendering and blocking JavaScript execution. The following optimizations were systematically applied to achieve a **90+ score**:
+
+###  Problem Analysis
+
+The main issues identified were:
+
+* Large dataset (200–500 tasks) processed on initial render
+* Multiple views (Kanban, List, Timeline) loaded simultaneously
+* Expensive filtering and sorting running on every render
+* High DOM node count in Kanban and Timeline views
+* No code splitting (entire app bundled together)
+* UI blocked during synchronous data generation
+
+---
+
+###  Optimizations Applied
+
+#### 1. Lazy Loading (Code Splitting)
+
+Implemented `React.lazy` and `Suspense` to load views only when required:
+
+* Prevented unnecessary loading of all views at startup
+* Reduced initial bundle size significantly
+* Improved First Contentful Paint (FCP)
+
+---
+
+#### 2. Deferred Data Initialization
+
+Used `requestIdleCallback` to defer heavy task generation:
+
+* Allowed UI to render instantly
+* Moved expensive computation off the critical render path
+* Reduced Total Blocking Time (TBT)
+
+---
+
+#### 3. Memoization (useMemo)
+
+Optimized expensive computations:
+
+* Filtering and sorting wrapped in `useMemo`
+* Prevented redundant recalculations
+* Improved render efficiency
+
+---
+
+#### 4. Zustand Selector Optimization
+
+Replaced full-store subscriptions:
+
+```ts
+const { tasks, filters } = useTaskStore(); ❌
+```
+
+with selective subscriptions:
+
+```ts
+const tasks = useTaskStore((s) => s.tasks);
+const filters = useTaskStore((s) => s.filters);
+```
+
+* Reduced unnecessary re-renders
+* Improved component isolation
+
+---
+
+#### 5. Component Memoization
+
+Applied `React.memo` to:
+
+* TaskCard (Kanban)
+
+* Row (List View)
+
+* Prevented re-rendering unchanged components
+
+* Improved performance in large lists
+
+---
+
+#### 6. Reduced Initial DOM Load
+
+* Limited initial Kanban rendering (e.g., first 20 tasks per column)
+* Avoided rendering hundreds of elements simultaneously
+* Reduced layout calculation cost
+
+---
+
+#### 7. Virtual Scrolling (List View)
+
+* Only visible rows rendered
+* Spacer elements maintain scroll height
+* Prevents DOM overload
+
+---
+
+#### 8. Skeleton-Based Loading Strategy
+
+* Avoided blocking UI during data load
+* Improved perceived performance
+* Reduced layout shifts
+
+---
+
+###  Result
+
+| Metric                 | Before | After  |
+| ---------------------- | ------ | ------ |
+| Performance Score      | ~56    | 85–95+ |
+| First Contentful Paint | Slow   | Fast   |
+| Total Blocking Time    | High   | Low    |
+| User Perception        | Laggy  | Smooth |
+
+---
+
+##  Skeleton UI Strategy
+
+To improve both **user experience and perceived performance**, a structured skeleton loading system was implemented.
+
+---
+
+###  Types of Skeletons Used
+
+#### 1. App-Level Skeleton (Initial Load)
+
+Displayed before data initialization:
+
+* Mimics full layout (buttons, filters, Kanban columns)
+* Prevents blank screen
+* Used with global `loading` state
+
+---
+
+#### 2. Suspense Fallback Skeleton
+
+Used during lazy loading:
+
+```tsx
+<Suspense fallback={<AppSkeleton />}>
+```
+
+* Ensures smooth transition between views
+* Eliminates “Loading...” text flashes
+
+---
+
+#### 3. View-Level Skeletons
+
+Each view has its own skeleton:
+
+* Kanban → column + card placeholders
+* List → table row placeholders
+* Timeline → bar placeholders
+
+---
+
+#### 4. Filter Empty State Skeleton
+
+Instead of empty UI:
+
+* Shows skeleton placeholders
+* Maintains layout consistency
+* Avoids abrupt visual gaps
+
+---
+
+###  Why Skeleton Instead of Spinner?
+
+Skeleton UI was chosen because:
+
+* Preserves layout structure
+* Reduces perceived wait time
+* Prevents layout shift (CLS)
+* Provides visual continuity
+
+---
+
+###  Implementation Highlights
+
+* Reusable `Skeleton` component
+* Tailwind-based shimmer effect
+* Conditional rendering based on:
+
+  * `loading`
+  * `tasks.length`
+  * `filteredTasks.length`
+
+---
+
+##  Key Learnings
+
+* Performance is not just about speed, but **perceived responsiveness**
+* Avoid heavy work during initial render
+* Memoization and selective subscriptions are critical in large datasets
+* Skeleton UI significantly improves UX even when actual load time is unchanged
+
+---
+
 ## Deployment
 
-Deployed on Vercel:
-👉 https://your-project.vercel.app
+Deployed on Netlify:
+  [Live Demo](https://projectttracker.netlify.app/)
+
 
 ---
 
