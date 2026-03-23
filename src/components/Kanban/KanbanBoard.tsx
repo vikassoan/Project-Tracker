@@ -19,24 +19,37 @@ const KanbanBoard = () => {
   const filters = useTaskStore((s) => s.filters);
 
   const filteredTasks = useMemo(() => {
+    if (
+      !filters.status.length &&
+      !filters.priority.length &&
+      !filters.assignee.length &&
+      !filters.fromDate &&
+      !filters.toDate
+    ) {
+      return tasks;
+    }
+
     return tasks.filter((task) => {
-    if (filters.status.length && !filters.status.includes(task.status))
-      return false;
+      if (filters.status.length && !filters.status.includes(task.status))
+        return false;
 
-    if (filters.priority.length && !filters.priority.includes(task.priority))
-      return false;
+      if (filters.priority.length && !filters.priority.includes(task.priority))
+        return false;
 
-    if (filters.assignee.length && !filters.assignee.includes(task.assignee))
-      return false;
+      if (filters.assignee.length && !filters.assignee.includes(task.assignee))
+        return false;
 
-    if (filters.fromDate && new Date(task.dueDate) < new Date(filters.fromDate))
-      return false;
+      if (
+        filters.fromDate &&
+        new Date(task.dueDate) < new Date(filters.fromDate)
+      )
+        return false;
 
-    if (filters.toDate && new Date(task.dueDate) > new Date(filters.toDate))
-      return false;
+      if (filters.toDate && new Date(task.dueDate) > new Date(filters.toDate))
+        return false;
 
-    return true;
-  });
+      return true;
+    });
   }, [tasks, filters]);
 
   useEffect(() => {
@@ -115,7 +128,7 @@ const KanbanBoard = () => {
                     </div>
                   ) : null
                 ) : (
-                  columnTasks.map((task) => {
+                  columnTasks.slice(0, 20).map((task) => {
                     const isDragging = draggingTask?.id === task.id;
 
                     return isDragging ? (

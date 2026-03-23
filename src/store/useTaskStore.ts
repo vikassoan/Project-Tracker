@@ -21,6 +21,9 @@ type TaskState = {
   filters: Filters;
   users: ActiveUser[];
 
+  loading: boolean;              // ✅ ADD
+  setLoading: (val: boolean) => void;  // ✅ ADD
+
   setTasks: (tasks: Task[]) => void;
   setFilters: (filters: Partial<Filters>) => void;
 
@@ -29,11 +32,6 @@ type TaskState = {
 };
 
 export const useTaskStore = create<TaskState>((set) => ({
-  users: [
-    { id: "u1", name: "A", color: "#ef4444", taskId: null },
-    { id: "u2", name: "B", color: "#3b82f6", taskId: null },
-    { id: "u3", name: "C", color: "#22c55e", taskId: null },
-  ],
   tasks: [],
 
   filters: {
@@ -41,6 +39,30 @@ export const useTaskStore = create<TaskState>((set) => ({
     priority: [],
     assignee: [],
   },
+
+  users: [
+    { id: "u1", name: "A", color: "#ef4444", taskId: null },
+    { id: "u2", name: "B", color: "#3b82f6", taskId: null },
+    { id: "u3", name: "C", color: "#22c55e", taskId: null },
+  ],
+
+  loading: true, // ✅ INITIAL TRUE
+
+  setLoading: (val) => set({ loading: val }),
+
+  setTasks: (tasks) => set({ tasks }),
+
+  setFilters: (newFilters) =>
+    set((state) => ({
+      filters: { ...state.filters, ...newFilters },
+    })),
+
+  updateTaskStatus: (id, status) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task.id === id ? { ...task, status } : task
+      ),
+    })),
 
   moveUsers: () =>
     set((state) => ({
@@ -53,19 +75,5 @@ export const useTaskStore = create<TaskState>((set) => ({
           taskId: randomTask?.id || null,
         };
       }),
-    })),
-
-  setTasks: (tasks) => set({ tasks }),
-
-  setFilters: (newFilters) =>
-    set((state) => ({
-      filters: { ...state.filters, ...newFilters },
-    })),
-
-  updateTaskStatus: (id, status) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === id ? { ...task, status } : task,
-      ),
     })),
 }));

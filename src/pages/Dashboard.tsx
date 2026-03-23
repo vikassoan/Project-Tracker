@@ -4,6 +4,7 @@ const KanbanBoard = lazy(() => import("../components/Kanban/KanbanBoard"));
 const ListView = lazy(() => import("../components/List/ListView"));
 const TimelineView = lazy(() => import("../components/Timeline/TimelineView"));
 import FilterBar from "../components/Filters/FilterBar";
+import AppSkeleton from "../components/Common/AppSkeleton";
 import { useSearchParams } from "react-router-dom";
 import { useTaskStore } from "../store/useTaskStore";
 
@@ -57,7 +58,7 @@ const Dashboard = () => {
       </div>
       <FilterBar />
       <div className="border rounded p-4 h-[80vh] overflow-hidden">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<AppSkeleton />}>
           {view === "kanban" && <KanbanBoard />}
           {view === "list" && <ListView />}
           {view === "timeline" && <TimelineView />}

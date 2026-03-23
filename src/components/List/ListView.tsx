@@ -15,24 +15,36 @@ const ListView = () => {
   const filters = useTaskStore((s) => s.filters);
 
   const filteredTasks = useMemo(() => {
+    if (
+      !filters.status.length &&
+      !filters.priority.length &&
+      !filters.assignee.length &&
+      !filters.fromDate &&
+      !filters.toDate
+    ) {
+      return tasks;
+    }
     return tasks.filter((task) => {
-    if (filters.status.length && !filters.status.includes(task.status))
-      return false;
+      if (filters.status.length && !filters.status.includes(task.status))
+        return false;
 
-    if (filters.priority.length && !filters.priority.includes(task.priority))
-      return false;
+      if (filters.priority.length && !filters.priority.includes(task.priority))
+        return false;
 
-    if (filters.assignee.length && !filters.assignee.includes(task.assignee))
-      return false;
+      if (filters.assignee.length && !filters.assignee.includes(task.assignee))
+        return false;
 
-    if (filters.fromDate && new Date(task.dueDate) < new Date(filters.fromDate))
-      return false;
+      if (
+        filters.fromDate &&
+        new Date(task.dueDate) < new Date(filters.fromDate)
+      )
+        return false;
 
-    if (filters.toDate && new Date(task.dueDate) > new Date(filters.toDate))
-      return false;
+      if (filters.toDate && new Date(task.dueDate) > new Date(filters.toDate))
+        return false;
 
-    return true;
-  });
+      return true;
+    });
   }, [tasks, filters]);
 
   const [sortKey, setSortKey] = useState<SortKey>("title");
@@ -40,24 +52,24 @@ const ListView = () => {
 
   const sortedTasks = useMemo(() => {
     return [...filteredTasks].sort((a, b) => {
-    let valA: any = a[sortKey];
-    let valB: any = b[sortKey];
+      let valA: any = a[sortKey];
+      let valB: any = b[sortKey];
 
-    if (sortKey === "priority") {
-      const order = ["Critical", "High", "Medium", "Low"];
-      valA = order.indexOf(a.priority);
-      valB = order.indexOf(b.priority);
-    }
+      if (sortKey === "priority") {
+        const order = ["Critical", "High", "Medium", "Low"];
+        valA = order.indexOf(a.priority);
+        valB = order.indexOf(b.priority);
+      }
 
-    if (sortKey === "dueDate") {
-      valA = new Date(a.dueDate).getTime();
-      valB = new Date(b.dueDate).getTime();
-    }
+      if (sortKey === "dueDate") {
+        valA = new Date(a.dueDate).getTime();
+        valB = new Date(b.dueDate).getTime();
+      }
 
-    if (valA < valB) return direction === "asc" ? -1 : 1;
-    if (valA > valB) return direction === "asc" ? 1 : -1;
-    return 0;
-  });
+      if (valA < valB) return direction === "asc" ? -1 : 1;
+      if (valA > valB) return direction === "asc" ? 1 : -1;
+      return 0;
+    });
   }, [filteredTasks, sortKey, direction]);
 
   const totalRows = sortedTasks.length;

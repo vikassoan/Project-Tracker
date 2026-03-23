@@ -39,7 +39,7 @@ const TaskCard = ({ task, onDragStart, isDragging }: Props) => {
   const activeUsers = users.filter((u) => u.taskId === task.id);
   return (
     <div
-      style={{ transition: "transform 0.1s ease" }}
+      style={{ transition: "transform 0.1s ease", willChange: "transform" }}
       onPointerDown={(e) => onDragStart(task, e)}
       className={`bg-white p-3 rounded-lg shadow-sm border space-y-2 cursor-grab active:cursor-grabbing ${
         isDragging ? "opacity-50" : ""
