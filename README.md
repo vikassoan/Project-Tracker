@@ -323,7 +323,10 @@ Applied `React.memo` to:
 
 ---
 
-![Reference Image](/project-trcaker/public/screenshot.png)
+### Screenshot
+
+![Reference Image](/public/screenshot.png)
+
 
 ---
 
