@@ -323,6 +323,10 @@ Applied `React.memo` to:
 
 ---
 
+![Reference Image](/project-trcaker/public/screenshot.png)
+
+---
+
 ##  Skeleton UI Strategy
 
 To improve both **user experience and perceived performance**, a structured skeleton loading system was implemented.
